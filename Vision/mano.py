@@ -6,7 +6,7 @@ import numpy as np
 from math import acos, degrees
 import serial
 
-ser= serial.Serial("COM6",9600,timeout=1)
+ser= serial.Serial("COM5",9600,timeout=1)
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands
