@@ -1,29 +1,28 @@
 #include <Servo.h>
 
 Servo servos[5];
-
 float degreesServo[5];  // Estado lógico del servo: 0 = abierto, 180 = cerrado
-int velServo[5];  // Estado lógico del servo: 0 = abierto, 180 = cerrado
-
-float vel=0.005;
 
 String buffer = "";   // Almacena los datos recibidos
 String lastData = ""; // Para almacenar el último mensaje válido entre saltos de línea
 void setup() {
   Serial.begin(9600);
   initServos();
+ 
 }
 
 void initServos() {
+
   for (int i = 0; i < 5; i++) {
-    servos[i].attach(i + 2);  // Asocia cada servo al pin correspondiente
-    servos[i].write(90);      // Inicializa en posición neutra
-    degreesServo[i] = 0;      // Estado inicial: abierto
-    velServo[i]=0;
+    servos[i].attach(i + 2);  
+    servos[i].write(0);      
+    degreesServo[i] = 0;    
   }
 }
 
 void loop() {
+  // testServos();
+
   readSerialData(); // Lee y actualiza el buffer con datos válidos
   actions();        // Procesa el último mensaje válido
 }
@@ -49,28 +48,18 @@ void readSerialData() {
 }
 
 void actions() {
-  // Procesa solo el último dato válido
   if (lastData.length() >= 5) { // Asegura que hay datos para los 5 servos
     for (int i = 0; i < 5; i++) {
-      if (lastData[i] == '1') {
-        servos[i].write(160);  // Cierra el dedo
-        velServo[i]=-1;
-      } else if (lastData[i] == '0') {
-        servos[i].write(20);    // Abre el dedo
-        velServo[i]=1;
+      if (lastData[i] == '1' && degreesServo[i]!=180) {
+        servos[i].write(180);  // Cierra el dedo
+        degreesServo[i] = 180;
+      } 
+      else if (lastData[i] == '0' && degreesServo[i]!=0) {
+        servos[i].write(0);    // Abre el dedo
+        degreesServo[i] = 0;
       }
     }
     lastData = ""; // Limpia el string después de procesarlo    
   }
 
-  for(int i = 0; i < 5; i++){
-    float newTotal= degreesServo[i]+velServo[i]*vel;
-    if(newTotal<=0 || newTotal>=100 ){
-      servos[i].write(90);
-      velServo[i]=0;
-    }
-    else{
-      degreesServo[i]=newTotal;
-    }
-  }
 }
